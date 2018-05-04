@@ -87,8 +87,10 @@ class ManagePurchase extends Component {
 		destinationType: PropTypes.string,
 		hasLoadedSites: PropTypes.bool.isRequired,
 		hasLoadedUserPurchasesFromServer: PropTypes.bool.isRequired,
+		plan: PropTypes.object,
 		selectedPurchase: PropTypes.object,
 		selectedSite: PropTypes.oneOfType( [ PropTypes.object, PropTypes.bool ] ),
+		theme: PropTypes.object,
 	};
 
 	componentWillMount() {
@@ -488,10 +490,12 @@ export default connect( ( state, props ) => {
 		selectedPurchase,
 		selectedSiteId,
 		selectedSite,
-		plan: isPurchasePlan && applyTestFiltersToPlansList( selectedPurchase.productSlug, abtest ),
 		isPurchaseTheme,
-		theme: isPurchaseTheme && getCanonicalTheme( state, selectedSiteId, selectedPurchase.meta ),
 		isAtomicSite: selectedSite && isSiteAtomic( state, selectedSiteId ),
+		plan: isPurchasePlan
+			? applyTestFiltersToPlansList( selectedPurchase.productSlug, abtest )
+			: undefined,
+		theme: isPurchaseTheme ? getCanonicalTheme( state, siteId, selectedPurchase.meta ) : undefined,
 		userId: getCurrentUserId( state ),
 	};
 } )( localize( ManagePurchase ) );
