@@ -89,17 +89,17 @@
 	}
 
 	@include breakpoint( '<960px' ) {
-		.search-filters__tld-button:nth-child(n + 8) {
+		.search-filters__tld-button:nth-child(n + 7) {
 			display: none;
 		}
 	}
 	@include breakpoint( '<800px' ) {
-		.search-filters__tld-button:nth-child(n + 6) {
+		.search-filters__tld-button:nth-child(n + 5) {
 			display: none;
 		}
 	}
 	@include breakpoint( '<660px' ) {
-		.search-filters__tld-button:nth-child(n + 4) {
+		.search-filters__tld-button:nth-child(n + 3) {
 			display: none;
 		}
 	}
