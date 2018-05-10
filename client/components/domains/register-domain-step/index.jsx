@@ -475,6 +475,7 @@ class RegisterDomainStep extends React.Component {
 
 		const nextState = {
 			error: null,
+			errorData: null,
 			exactMatchDomain: null,
 			lastDomainSearched: null,
 			loadingResults,
@@ -556,6 +557,7 @@ class RegisterDomainStep extends React.Component {
 		this.setState(
 			{
 				error: null,
+				errorData: null,
 				exactMatchDomain: null,
 				lastQuery: searchQuery,
 				lastDomainSearched: null,
@@ -607,7 +609,11 @@ class RegisterDomainStep extends React.Component {
 						lastDomainIsTransferrable: isDomainTransferrable,
 					} );
 					if ( isDomainAvailable ) {
-						this.setState( { showNotice: false, error: null } );
+						this.setState( {
+							showNotice: false,
+							error: null,
+							errorData: null,
+						} );
 					} else {
 						this.showValidationErrorMessage( domain, status, {
 							site: get( result, 'other_site_domain', null ),
@@ -1053,11 +1059,6 @@ class RegisterDomainStep extends React.Component {
 		const { TRANSFERRABLE } = domainAvailability;
 		if ( TRANSFERRABLE === error && this.state.lastDomainIsTransferrable ) {
 			return;
-		}
-
-		let site = get( errorData, 'site', null );
-		if ( ! site ) {
-			site = get( this.props, 'selectedSite.slug', null );
 		}
 		this.setState( { showNotice: true, error, errorData } );
 	}
