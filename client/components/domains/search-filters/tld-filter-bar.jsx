@@ -75,13 +75,7 @@ export class TldFilterBar extends Component {
 		this.props.onSubmit();
 	};
 	handleTokenChange = newTlds => {
-		const tlds = [
-			...new Set( [
-				...this.props.filters.tlds,
-				...newTlds.filter( tld => includes( this.props.availableTlds, tld ) ),
-			] ),
-		];
-
+		const tlds = newTlds.filter( tld => includes( this.props.availableTlds, tld ) );
 		this.props.onChange( { tlds } );
 	};
 
