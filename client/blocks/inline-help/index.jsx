@@ -157,7 +157,9 @@ class InlineHelp extends Component {
 						onCancel={ this.closeDialog }
 						onClose={ this.closeDialog }
 					>
-						{ dialogType === 'article' && <MinimalPost blogId={  } postId={ 3307 } /> }
+						{ dialogType === 'article' && (
+							<MinimalPost blogId={ SUPPORT_BLOG_ID } postId={ 134940 } />
+						) }
 						{ dialogType === 'video' && (
 							<div className={ iframeClasses }>
 								<ResizableIframe
