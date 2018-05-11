@@ -25,6 +25,7 @@ import isHappychatOpen from 'state/happychat/selectors/is-happychat-open';
 import hasActiveHappychatSession from 'state/happychat/selectors/has-active-happychat-session';
 import AsyncLoad from 'components/async-load';
 import MinimalPost from 'blocks/reader-full-post/minimal.jsx';
+import { SUPPORT_BLOG_ID } from 'blocks/inline-help/constants';
 
 /**
  * Module variables
@@ -156,7 +157,7 @@ class InlineHelp extends Component {
 						onCancel={ this.closeDialog }
 						onClose={ this.closeDialog }
 					>
-						{ dialogType === 'article' && <MinimalPost blogId={ 9619154 } postId={ 3307 } /> }
+						{ dialogType === 'article' && <MinimalPost blogId={  } postId={ 3307 } /> }
 						{ dialogType === 'video' && (
 							<div className={ iframeClasses }>
 								<ResizableIframe
