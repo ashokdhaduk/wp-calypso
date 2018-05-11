@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { localize } from 'i18n-calypso';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { get, find, defer } from 'lodash';
+import { get, find, defer, includes, isEqual } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -24,6 +24,7 @@ import { fullCreditsPayment, newCardPayment, storedCardPayment } from 'lib/store
 import analytics from 'lib/analytics';
 import TransactionStepsMixin from './transaction-steps-mixin';
 import { setPayment } from 'lib/upgrades/actions';
+import { requestEmergentPaywallConfiguration } from 'state/transactions/emergent-paywall-configuration/actions';
 import { forPayments as countriesListForPayments } from 'lib/countries-list';
 import debugFactory from 'debug';
 import cartValues, { isPaidForFullyInCredits, isFree, cartItems } from 'lib/cart-values';
@@ -84,6 +85,13 @@ const SecurePaymentForm = createReactClass( {
 			return;
 		}
 
+		if (
+			this.state.visiblePaymentBox !== 'emergent-paywall' &&
+			! isEqual( nextProps.cart.total_cost, this.props.cart.total_cost )
+		) {
+			this.props.requestEmergentPaywallConfiguration( 'IN', this.props.cart );
+		}
+
 		this.setState( {
 			visiblePaymentBox: this.getVisiblePaymentBox( nextProps.cart, nextProps.paymentMethods ),
 		} );
@@ -102,6 +110,9 @@ const SecurePaymentForm = createReactClass( {
 
 	componentWillMount() {
 		this.setInitialPaymentDetails();
+		if ( includes( this.props.paymentMethods, 'emergent-paywall' ) ) {
+			this.props.requestEmergentPaywallConfiguration( 'IN', this.props.cart );
+		}
 	},
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -400,8 +411,11 @@ const SecurePaymentForm = createReactClass( {
 	},
 } );
 
-export default connect( state => {
-	return {
-		presaleChatAvailable: isPresalesChatAvailable( state ),
-	};
-}, null )( localize( SecurePaymentForm ) );
+export default connect(
+	state => {
+		return {
+			presaleChatAvailable: isPresalesChatAvailable( state ),
+		};
+	},
+	{ requestEmergentPaywallConfiguration }
+)( localize( SecurePaymentForm ) );

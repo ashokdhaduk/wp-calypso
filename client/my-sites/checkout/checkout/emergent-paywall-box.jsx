@@ -8,6 +8,7 @@ import React, { Component } from 'react';
 import page from 'page';
 import classNames from 'classnames';
 import { get, isEqual, debounce, startsWith } from 'lodash';
+import { connect } from 'react-redux';
 import debug from 'debug';
 
 /**
@@ -18,6 +19,9 @@ import notices from 'notices';
 import analytics from 'lib/analytics';
 import { paymentMethodName, paymentMethodClassName } from 'lib/cart-values';
 import TermsOfService from './terms-of-service';
+import { getEmergentPaywallConfiguration } from 'state/selectors';
+import { requestEmergentPaywallConfiguration } from 'state/transactions/emergent-paywall-configuration/actions';
+
 import wp from 'lib/wp';
 
 const wpcom = wp.undocumented();
@@ -38,8 +42,10 @@ export class EmergentPaywallBox extends Component {
 	}
 
 	componentWillMount() {
-		this.fetchIframeConfiguration();
 		window.addEventListener( 'message', this.onMessageReceiveHandler, false );
+		if ( this.props.iframeConfig ) {
+			this.loadIframe();
+		}
 	}
 
 	componentWillUnmount() {
@@ -47,18 +53,31 @@ export class EmergentPaywallBox extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		// If our iframe config has been update we must refresh the iframe
+		if (
+			this.props.iframeConfig &&
+			prevProps.iframeConfig &&
+			! isEqual( prevProps.iframeConfig.charge_id, this.props.iframeConfig.charge_id )
+		) {
+			this.loadIframe();
+		}
+		// Check if our cart is updated
+		// TODO: @ramonjd Fix this before merge.
+		// This is crude, since the sum of different products MAY have the same cost
 		if ( ! isEqual( prevProps.cart.total_cost, this.props.cart.total_cost ) ) {
-			this.fetchIframeConfiguration();
+			this.props.requestEmergentPaywallConfiguration( 'IN', this.props.cart );
 		}
 	}
 
 	getInitialState() {
 		return {
-			paywall_url: '',
+			// iframe values from wpcom
+			// paywall_url: '',
+			// payload: '',
+			// charge_id: '',
+			// signature: '',
+
 			paymentMethod: paymentMethodClassName( 'emergent-paywall' ),
-			payload: '',
-			charge_id: '',
-			signature: '',
 			iframeHeight: 600,
 			iframeWidth: 750,
 			hasConfigLoaded: false,
@@ -145,21 +164,17 @@ export class EmergentPaywallBox extends Component {
 		wpcom.emergentPaywellConfiguration( 'IN', this.props.cart, this.loadIframe );
 	};
 
-	loadIframe = ( error, iframeConfig ) => {
+	loadIframe = () => {
+		/*		Move the error notice to the data layer http call
 		if ( error ) {
 			notices.error( this.props.translate( "There's been an error. Please try again later." ) );
-			this.setState( this.getInitialState() );
 			return;
-		}
-
+		}*/
 		this.setState(
 			{
 				hasConfigLoaded: true,
-				...iframeConfig,
 			},
-			() => {
-				this.formRef.current.submit();
-			}
+			() => this.formRef.current.submit()
 		);
 	};
 
@@ -176,9 +191,10 @@ export class EmergentPaywallBox extends Component {
 	}
 
 	render() {
-		const { payload, paywall_url, signature, iframeHeight, hasConfigLoaded } = this.state;
+		const { iframeHeight } = this.state;
+		const { payload, paywall_url, signature } = this.props.iframeConfig;
 		const iframeContainerClasses = classNames( 'checkout__emergent-paywall-frame-container', {
-			'iframe-loaded': hasConfigLoaded,
+			'iframe-loaded': !! this.props.iframeConfig,
 		} );
 
 		return (
@@ -186,7 +202,7 @@ export class EmergentPaywallBox extends Component {
 				<TermsOfService />
 				<div className="checkout__payment-box-sections">
 					<div className="checkout__payment-box-section">{ this.props.children }</div>
-					{ ! hasConfigLoaded && this.renderLoadingBlock() }
+					{ ! this.props.iframeConfig && this.renderLoadingBlock() }
 					<div className={ iframeContainerClasses }>
 						<form
 							className="checkout__emergent-paywall-form"
@@ -214,4 +230,9 @@ export class EmergentPaywallBox extends Component {
 	}
 }
 
-export default localize( EmergentPaywallBox );
+export default connect(
+	state => ( {
+		iframeConfig: getEmergentPaywallConfiguration( state ),
+	} ),
+	{ requestEmergentPaywallConfiguration }
+)( localize( EmergentPaywallBox ) );

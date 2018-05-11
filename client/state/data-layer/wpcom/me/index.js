@@ -10,6 +10,7 @@ import { mergeHandlers } from 'state/action-watchers/utils';
 import block from './block';
 import connectedApplications from './connected-applications';
 import devices from './devices';
+import emergentPaywallConfiguration from './emergent-paywall-configuration';
 import notification from './notification';
 import settings from './settings';
 import sendVerificationEmail from './send-verification-email';
@@ -22,6 +23,7 @@ export default mergeHandlers(
 	connectedApplications,
 	countries,
 	devices,
+	emergentPaywallConfiguration,
 	notification,
 	settings,
 	sendVerificationEmail,
