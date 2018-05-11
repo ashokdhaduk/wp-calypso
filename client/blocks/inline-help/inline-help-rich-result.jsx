@@ -61,9 +61,18 @@ class InlineHelpRichResult extends Component {
 			} else {
 				this.props.setDialogState( {
 					showDialog: true,
+					dialogType: 'video',
 					videoLink: get( this.props.result, RESULT_LINK ),
 				} );
 			}
+		} else if ( type === RESULT_ARTICLE ) {
+			event.preventDefault();
+			// this.getArticleContent(  )
+			this.props.setDialogState( {
+				showDialog: true,
+				dialogType: 'article',
+				videoLink: null,
+			} );
 		} else {
 			if ( ! href ) {
 				return;
